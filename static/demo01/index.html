@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🖐️Vuejs Demo01</title>
+    <link rel="shortcut icon" type="image/x-icon" href="../assets/favicon.ico">
+    <script src="../assets/vue.js"></script>
+</head>
+<body>
+    <div id="app">
+        <!-- 1. 创建vue实例对象 -->
+        <h1>Hello World实例</h1>
+        <hr>
+        <div id="app">
+            <p>{{ message }}</p>
+        </div>
+    
+
+        <!-- 2. v-if、v-else、v-show -->
+        <h1>v-if、v-else、v-show</h1>
+        <hr>
+        <p v-if="awesome">Vue is awesome!</p>
+        <p v-else>Oh no 😢</p>
+        <!-- v-else 元素必须紧跟在带 v-if 或者 v-else-if 的元素的后面，否则它将不会被识别。 -->
+        <div style="margin: 10px auto;">
+            <!--
+                v-if 是一个指令，所以必须将它添加到一个元素上。但是如果想切换多个元素呢
+                此时可以把一个 <template> 元素当做不可见的包裹元素，并在上面使用 v-if。
+                最终的渲染结果将不包含 <template> 元素
+                API文档：https://cn.vuejs.org/v2/guide/conditional.html
+            -->
+            <template v-if="Math.random() > 0.5">
+                <p>随机数大于0.5，Now you see me ～</p>
+                <p>😝</p>
+            </template>
+            <p v-else>随机数小于0.5😢，Now you don't !</p>
+        </div>
+
+
+        <!-- 3. v-for -->
+        <h1>v-for</h1>
+        <hr>
+        <p>1. 遍历对象数组</p>
+        <ul>
+            <!--
+                在 v-for 块中，我们可以访问所有父作用域的 property。v-for 还支持一个可选的第二个参数，即当前项的索引。
+                API文档：https://cn.vuejs.org/v2/guide/list.html
+            -->
+            <li v-for="(item, key) in items" v-bind:key="item.message">{{ key }} - {{ item.message }} - {{ message }}</li>
+        </ul>
+        <p>2. 遍历对象</p>
+        <ul>
+            <!-- 提供第二个的参数为 property 名称 (也就是键名)，还可以用第三个参数作为索引 -->
+            <li v-for="(value, key, index) in object" v-bind:key="key">{{ index }} - {{ key }} - {{ value }}</li>
+        </ul>
+        <p>3. 计算属性computed 实现 过滤/排序</p>
+        <ul>
+            <li v-for="number in evenNumbers">{{ number }}</li>
+        </ul>
+        <p>4. 方法methods 实现 过滤/排序</p>
+        <ul v-for="set in sets">
+            <li v-for="num in even(set)">{{ num }}</li>
+        </ul>
+        <p>5. 直接接受整数作为遍历次数</p>
+        <ul>
+            <li v-for="(n, index) in 10" :key="index">{{ n }}</li>
+        </ul>
+        <p>6. 在template中使用</p>
+        <ul>
+            <template v-for="item in items">
+                <li>{{ item.message }}</li>
+                <li style="list-style: none;">
+                    <img width="40" src="https://cn.vuejs.org/images/logo.png" alt="logo">
+                </li>
+            </template>
+        </ul>
+        <p>7. 在组件中使用</p>
+        <form v-on:submit.prevent="addNewTodo">
+            <label>Add a TODO</label>
+            <input type="text" placeholder="Please fill it out here." v-model="newTodoText">
+            <button>Add</button>
+        </form>
+        <ul>
+            <!-- 
+                is属性attribute文档：https://cn.vuejs.org/v2/guide/components.html#%E8%A7%A3%E6%9E%90-DOM-%E6%A8%A1%E6%9D%BF%E6%97%B6%E7%9A%84%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9
+                2.2.0+ 的版本里，当在组件上使用 v-for 时，key 现在是必须的。
+                [v-for 与 v-if 一同使用] 当它们处于同一节点，v-for 的优先级比 v-if 更高，这意味着 v-if 将分别重复运行于每个 v-for 循环中。
+            -->
+            <li
+                is="todo-item"
+                v-for="(todo, index) in todos"
+                v-bind:key="todo.id"
+                v-bind:title="todo.title"
+                v-on:remove="todos.splice(index, 1)">
+            </li>
+        </ul>
+    </div>
+</body>
+<script>
+    // 创建Vue组件
+    Vue.component('todo-item', {
+        template: `
+            <li>
+                {{ title }}
+                <button v-on:click="$emit('remove')">Remove</button>
+            </li>
+        `,
+        props: ['title']
+    });
+
+    // 通过ID创建Vue实例对象，被实例化的区域均被vue接管
+    var app = new Vue({
+        el: '#app',
+        data: {
+            message: '我是双向绑定的message🍺~',
+            awesome: true,
+            items: [
+                { message: 'Foo' },
+                { message: 'Bar' }
+            ],
+            object: {
+                title: 'How to do lists in Vue',
+                author: 'Jane Doe',
+                publishedAt: '2016-04-10'
+            },
+            numbers: [ 1, 2, 3, 4, 5 ],
+            sets: [[ 1, 2, 3, 4, 5 ], [6, 7, 8, 9, 10]],
+            todos: [
+                {
+                    id: 1,
+                    title: 'Do the dishes',
+                },
+                {
+                    id: 2,
+                    title: 'Take out the trash',
+                },
+                {
+                    id: 3,
+                    title: 'Mow the lawn'
+                }
+            ],
+            newTodoText: '',
+            newTodoId: 4
+        },
+        computed: {
+            evenNumbers: function() {
+                // 第一种写法：传统
+                return this.numbers.filter(
+                    function(number) {
+                        return number % 2 != 0;
+                    }
+                );
+                // 第二种写法：ES6
+                return this.numbers.filter(number => number % 2 != 0);
+            }
+        },
+        methods: {
+            even: function(numbers) {
+                // 第一种写法：传统
+                return numbers.filter(
+                    function(number) {
+                        return number % 2 != 0;
+                    }
+                );
+                // 第二种写法：ES6
+                return numbers.filter(number => number % 2 != 0);
+            },
+            addNewTodo: function() {
+                this.todos.push({
+                    id: this.newTodoId++,
+                    title: this.newTodoText
+                });
+                this.newTodoText = '';
+            }
+        }
+    });
+</script>
+</html>
